@@ -1,8 +1,11 @@
-import { Implementation } from "@quick-qui/model-defines";
+import { Implementation, StringKeyObject } from "@quick-qui/model-defines";
 import { spawn } from "child_process";
 import path from "path";
 import _ from "lodash";
-export const command = (implementation: Implementation) => {
+export const command = (
+  implementation: Implementation,
+  global: StringKeyObject
+) => {
   const p: string = implementation.parameters?.["path"] ?? ".";
   const command = implementation.parameters?.["command"] ?? "npm";
   const args: string[] = implementation.parameters?.["args"] ?? [];
@@ -13,6 +16,6 @@ export const command = (implementation: Implementation) => {
   spawn(command, args, {
     cwd: absolutePath,
     stdio: "inherit",
-    env: _.extend({}, process.env, env)
+    env: _.extend({}, process.env, global, env)
   });
 };

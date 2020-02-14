@@ -4,13 +4,15 @@ import { command } from "./Command";
 import { docker } from "./Docker";
 
 model.then(m => {
-  withImplementationModel(m)?.implementationModel?.implementations?.forEach(
+  const implementationModel = withImplementationModel(m)?.implementationModel
+  const global = implementationModel?.env ?? {}
+  implementationModel?.implementations?. forEach(
     implementation => {
       if (implementation.runtime === "command") {
-        command(implementation);
+        command(implementation,global);
       }
       if (implementation.runtime === "docker") {
-        docker(implementation);
+        docker(implementation,global);
       }
       //TODO 添加其他runtime -  docker
       //TODO 是否有package形式的implement？
