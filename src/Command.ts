@@ -4,7 +4,7 @@ import path from "path";
 import _ from "lodash";
 export const command = (
   implementation: Implementation,
-  global: StringKeyObject
+  globalEnv: StringKeyObject
 ) => {
   const p: string = implementation.parameters?.["path"] ?? ".";
   const command = implementation.parameters?.["command"] ?? "npm";
@@ -12,10 +12,10 @@ export const command = (
   const env = implementation.env ?? {};
   const absolutePath = path.resolve(".", p);
 
-  console.log(absolutePath, command);
+  console.log(absolutePath, command, args);
   spawn(command, args, {
     cwd: absolutePath,
     stdio: "inherit",
-    env: _.extend({}, process.env, global, env)
+    env: _.extend({ PATH: process.env.PATH }, globalEnv, env)
   });
 };
