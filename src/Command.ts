@@ -16,6 +16,6 @@ export const command = (
   spawn(command, args, {
     cwd: absolutePath,
     stdio: "inherit",
-    env: _.extend({ PATH: process.env.PATH }, globalEnv, env)
+    env: _.extend({},process.env,{ PATH: process.env.PATH }, globalEnv, env)
   });
 };
