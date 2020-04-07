@@ -1,3 +1,5 @@
+import { fail } from "assert";
+
 export function filterObject(obj: any) {
   const ret: any = {};
   Object.keys(obj)
@@ -6,6 +8,7 @@ export function filterObject(obj: any) {
   return ret;
 }
 
-export function no(name: string) {
-  throw new Error(`env not found - ${name}`);
+
+export function noEnvFound(name: string, help?: string) {
+  fail(`env not found - ${name} - ${help ?? ""}`);
 }

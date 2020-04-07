@@ -2,6 +2,8 @@ import { Implementation, StringKeyObject } from "@quick-qui/model-defines";
 import { spawn } from "child_process";
 import path from "path";
 import _ from "lodash";
+import exitHook from "async-exit-hook";
+
 export const command = (
   implementation: Implementation,
   globalEnv: StringKeyObject
@@ -13,9 +15,14 @@ export const command = (
   const absolutePath = path.resolve(".", p);
 
   console.log(absolutePath, command, args);
-  spawn(command, args, {
+  const commandProcess = spawn(command, args, {
     cwd: absolutePath,
     stdio: "inherit",
-    env: _.extend({},process.env,{ PATH: process.env.PATH }, globalEnv, env)
+    env: _.extend({}, process.env, { PATH: process.env.PATH }, globalEnv, env)
+  });
+  exitHook(() => {
+    console.log("killing command process...");
+    commandProcess?.kill();
+    console.log(" command process killed");
   });
 };

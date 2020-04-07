@@ -13,12 +13,9 @@ export function docker(
     image: implementation.parameters?.["image"],
     links: implementation.parameters?.["links"],
     volumes: implementation.parameters?.["volumes"],
-    dependsOn: implementation.parameters?.["dependsOn"],
-    // environment: _.toPairs(_.extend({}, process.env, globalEnv, env)).filter(p=>!p[0].startsWith('npm')).map(
-    //   p => `${p[0]} = ${p[1]}`
-    // )
+    'depends_on': implementation.parameters?.["dependsOn"],
     environment: _.toPairs(_.extend({}, globalEnv, env)).map(
-      p => `${p[0]} = ${p[1]}`
+      p => `${p[0]}=${p[1]}`
     )
   };
 }
@@ -30,7 +27,7 @@ export interface ComposeConfig {
   links: string[];
   volumes: string[];
   environment: string[];
-  dependsOn: string[];
+  depends_on: string[];
 }
 
 /**

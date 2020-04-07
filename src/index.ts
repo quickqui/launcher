@@ -1,52 +1,37 @@
+export { dockerLaunch, modelServerConfig } from "./DockerLauncher";
+
+export { filterObject, noEnvFound } from "./Util";
 import { model } from "./Model";
-import * as yaml from "js-yaml";
 
-import {
-  withImplementationModel,
-  withoutAbstract
-} from "@quick-qui/model-defines";
-import { command } from "./Command";
-import { docker } from "./Docker";
+import { withImplementationModel } from "@quick-qui/model-defines";
 import _ from "lodash";
-import { launch } from "./RawLauncher";
+import { rawLaunch } from "./RawLauncher";
+import { dockerLaunch } from "./DockerLauncher";
+import { env } from "./Env";
 
-model.then(m => {
-  const implementationModel = withImplementationModel(m)?.implementationModel;
-  // const globalEnv = implementationModel?.env ?? {};
-  const launcherImplementation = implementationModel?.implementations.find(
-    implementation => implementation.runtime === "launcher"
-  );
-  if (launcherImplementation) {
-    if (launcherImplementation.parameters?.["type"] === "raw") {
-      launch(launcherImplementation, implementationModel!);
+//TODO 这个方式有没有价值？何时使用？
+//NOTE 本地launch，从../model-server起一个model-server子进程。
+export function launch() {
+  model.then(m => {
+    const implementationModel = withImplementationModel(m)?.implementationModel;
+    // const globalEnv = implementationModel?.env ?? {};
+    const launcherImplementation = implementationModel?.implementations.find(
+      implementation =>
+        implementation.runtime === "launcher" &&
+        (env.launcherName ? implementation.name === env.launcherName : true)
+    );
+    if (launcherImplementation) {
+      if (launcherImplementation.parameters?.["type"] === "raw") {
+        rawLaunch(launcherImplementation, implementationModel!);
+      } else if (launcherImplementation.parameters?.["type"] === "docker") {
+        dockerLaunch(launcherImplementation, implementationModel!);
+      } else {
+        throw new Error(
+          `launcher type is not supported yet - ${launcherImplementation.parameters?.["type"]}`
+        );
+      }
     } else {
-      throw new Error("only raw launcher is supported");
+      throw new Error("no launcher implementation found");
     }
-  } else {
-    throw new Error("no launcher implementation found");
-  }
-
-  // const implementations =
-  //   withoutAbstract(implementationModel?.implementations) ?? [];
-  // implementations
-  //   .filter(implementation => implementation.runtime === "command")
-  //   .forEach(implementation => command(implementation, globalEnv));
-  // const dockerConfigs = implementations
-  //   .filter(implementation => implementation.runtime === "docker")
-  //   .map(implementation => docker(implementation, globalEnv));
-  // if (dockerConfigs.length > 0) {
-  //   const all: any = {
-  //     version: "3",
-  //     services: {},
-  //     volumes: {
-  //       "app-folder": {}
-  //     }
-  //   };
-  //   dockerConfigs.forEach(config => {
-  //     all.services[config.service] = _.omit(config, "service");
-  //   });
-  //   //TODO 还没有完成呢。
-  //   console.log(JSON.stringify(all));
-  //   console.log(yaml.safeDump(all));
-  // }
-});
+  });
+}
