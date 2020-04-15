@@ -5,6 +5,9 @@
   "config": {
     "imageRepo": "nielinjie/quickqui-app-server"
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "start": "nodemon -x ts-node  src/index.ts"
   },
