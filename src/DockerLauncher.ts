@@ -5,7 +5,7 @@ import _ from "lodash";
 import * as yaml from "js-yaml";
 import { spawn, execSync } from "child_process";
 import path from "path";
-import { filterObject } from "./Util";
+import { filterObject, log } from "./Util";
 import exitHook from "async-exit-hook";
 
 export function dockerLaunch(
@@ -43,7 +43,7 @@ export function dockerLaunch(
     dockerConfigs.forEach(config => {
       all.services[config.service] = filterObject(_.omit(config, "service"));
     });
-    console.log(yaml.safeDump(all));
+    log.debug(yaml.safeDump(all));
 
     const configString = yaml.safeDump(all);
 
@@ -62,11 +62,11 @@ export function dockerLaunch(
     child.stderr.pipe(process.stderr);
 
     exitHook(() => {
-      console.log("shutting down docker-compose...");
+      log.info("shutting down docker-compose...");
       execSync(`docker-compose -f - -p ${project} down`, {
         input: configString
       });
-      console.log("docker-compose shut down ");
+      log.info("docker-compose shut down ");
     });
   }
 }

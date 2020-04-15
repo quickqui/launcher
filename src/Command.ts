@@ -3,6 +3,7 @@ import { spawn } from "child_process";
 import path from "path";
 import _ from "lodash";
 import exitHook from "async-exit-hook";
+import { log } from "./Util";
 
 export const command = (
   implementation: Implementation,
@@ -14,15 +15,17 @@ export const command = (
   const env = implementation.env ?? {};
   const absolutePath = path.resolve(".", p);
 
-  console.log(absolutePath, command, args);
+  log(absolutePath)
+  log(command)
+  log( args);
   const commandProcess = spawn(command, args, {
     cwd: absolutePath,
     stdio: "inherit",
     env: _.extend({}, process.env, { PATH: process.env.PATH }, globalEnv, env)
   });
   exitHook(() => {
-    console.log("killing command process...");
+    log.info("killing command process...");
     commandProcess?.kill();
-    console.log(" command process killed");
+    log.info(" command process killed");
   });
 };

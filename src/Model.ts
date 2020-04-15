@@ -8,6 +8,7 @@ import waitPort from "wait-port";
 const modelUrl = `http://localhost:${env.modelServerPort}`;
 
 import exitHook from "async-exit-hook";
+import { log } from "./Util";
 
 const params = {
   host: "localhost",
@@ -30,7 +31,7 @@ export const model: Promise<Model> = waitPort(params).then(_ =>
 
 exitHook(() => {
   //TODO 有时候kill不成功，没有明白是为啥。有时候启动会有port 1111被占用的报告。可能跟开发中save文件，此进程重启有关。
-  console.log(`killing model server...`);
+  log.info(`killing model server...`);
   server?.kill();
-  console.log(`model server killed`);
+  log.info(`model server killed`);
 });

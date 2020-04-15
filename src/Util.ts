@@ -12,3 +12,6 @@ export function filterObject(obj: any) {
 export function noEnvFound(name: string, help?: string) {
   fail(`env not found - ${name} - ${help ?? ""}`);
 }
+
+
+export const log = require('debug-logger')("quick-qui:launcher")
