@@ -1,27 +1,26 @@
 import { ImplementationModel, Implementation } from "@quick-qui/model-defines";
 import { command } from "./Command";
-import { docker } from "./Docker";
+import { docker, ComposeConfig } from "./Docker";
 import _ from "lodash";
 import * as yaml from "js-yaml";
 import { spawn, execSync } from "child_process";
 import path from "path";
-import { filterObject, log } from "./Util";
+import { filterObject, log, childProcess } from "./Util";
 import exitHook from "async-exit-hook";
 
 export function dockerLaunch(
   launcherImplementation: Implementation,
-  implementationModel: ImplementationModel,
-  additionalConfigs: any[] = []
+  implementationModel: ImplementationModel
 ) {
   const launcherEnv = launcherImplementation.env ?? {};
   const launch = launcherImplementation.parameters?.["launch"];
 
   const dockerConfigs = [
-    ...additionalConfigs,
+    modelServerConfig(launcherImplementation),
     ...launch
-      ?.map(launchName => {
+      ?.map((launchName) => {
         const implementation = implementationModel?.implementations?.find(
-          imp => imp.name === launchName
+          (imp) => imp.name === launchName
         );
         if (implementation && implementation.runtime === "docker") {
           return docker(implementation, launcherEnv);
@@ -29,18 +28,15 @@ export function dockerLaunch(
           return undefined;
         }
       })
-      .filter(_ => _ !== undefined)
+      .filter((_) => _ !== undefined),
   ];
 
   if (dockerConfigs.length > 0) {
     const all: any = {
       version: "3",
-      services: {}
-      // volumes: {
-      //   "app-folder": {}
-      // }
+      services: {},
     };
-    dockerConfigs.forEach(config => {
+    dockerConfigs.forEach((config) => {
       all.services[config.service] = filterObject(_.omit(config, "service"));
     });
     log.debug(yaml.safeDump(all));
@@ -51,29 +47,29 @@ export function dockerLaunch(
     const command = "docker-compose";
     const args = ["-f", "-", "-p", project, "up"];
     const absolutePath = path.resolve(".");
-    const child = spawn(command, args, {
-      cwd: absolutePath
-    });
 
-    child.stdin?.write(configString);
-    child.stdin?.end();
-
-    child.stdout.pipe(process.stdout);
-    child.stderr.pipe(process.stderr);
+    childProcess(command, args, absolutePath, configString);
 
     exitHook(() => {
       log.info("shutting down docker-compose...");
       execSync(`docker-compose -f - -p ${project} down`, {
-        input: configString
+        input: configString,
       });
       log.info("docker-compose shut down ");
     });
   }
 }
-export const modelServerConfig = {
-  service: "model-server",
-  image: "nielinjie/quickqui-model-server:latest",
-  environment: ["MODEL_PATH=/modelProjectDir"],
-  volumes: [`${"../model-front"}/:/modelProjectDir`],
-  ports: ["1111:1111"]
-};
+export function modelServerConfig(
+  launcherImplementation: Implementation
+): ComposeConfig {
+  return {
+    service: "model-server",
+    image: "nielinjie/quickqui-model-server:latest",
+    environment: ["MODEL_PATH=/modelProjectDir"],
+    volumes: [`${launcherImplementation.env?.['MODEL_PATH']}/:/modelProjectDir`],
+    ports: [1111],
+    links: [],
+    depends_on: [],
+    stdin_open: false,
+  };
+}

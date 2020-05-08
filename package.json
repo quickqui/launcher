@@ -2,6 +2,7 @@
   "name": "@quick-qui/launcher",
   "version": "1.2.5",
   "main": "dist/index.js",
+  "repository": "https://github.com/quickqui/launcher",
   "config": {
     "imageRepo": "nielinjie/quickqui-app-server"
   },
