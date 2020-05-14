@@ -12,7 +12,7 @@ export function launch(implementationModel: ImplementationModel) {
 
   const launcherImplementation = implementationModel?.implementations.find(
     (implementation) =>
-      implementation.abstract !== true &&
+      (implementation.abstract ?? false) !== true &&
       implementation.runtime === "launcher" &&
       ((launcherName ? implementation.name === launcherName : false) ||
         launcherType === implementation.parameters?.type)
