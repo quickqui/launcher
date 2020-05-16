@@ -76,7 +76,7 @@ export const npmCommand = (
     overrideEnv
   ) as NodeJS.ProcessEnv;
 
-  console.log(JSON.stringify(finalEnv,undefined,2));
+  log.debug(JSON.stringify(finalEnv,undefined,2));
   return {
     absolutePath,
     args,
