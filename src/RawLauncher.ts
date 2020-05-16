@@ -1,9 +1,6 @@
 import { ImplementationModel, Implementation } from "@quick-qui/model-defines";
-import { command, CommandConfig } from "./Command";
-import { spawn } from "child_process";
+import { command, CommandConfig, runCommand } from "./Command";
 import _ from "lodash";
-import exitHook from "async-exit-hook";
-import { log } from "./Util";
 import path from "path";
 export function rawLaunch(
   launcherImplementation: Implementation,
@@ -27,22 +24,10 @@ export function rawLaunch(
       })
       .filter((_) => _ !== undefined),
   ];
-  // console.log(commandConfigs)
   commandConfigs.forEach(runCommand);
 }
 
-function runCommand(config: CommandConfig) {
-  const commandProcess = spawn(config.command, config.args, {
-    cwd: config.absolutePath,
-    stdio: "inherit",
-    env: config.env,
-  });
-  exitHook(() => {
-    log.info("killing command process...");
-    commandProcess?.kill();
-    log.info(" command process killed");
-  });
-}
+
 
 function modelServerConfig(
   launcherImplementation: Implementation

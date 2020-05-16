@@ -5,6 +5,7 @@ import assert, { fail } from "assert";
 import { ImplementationModel } from "@quick-qui/model-defines";
 import { dockerLaunch } from "./DockerLauncher";
 import { rawLaunch } from "./RawLauncher";
+import { npmLaunch } from "./NpmLauncher";
 
 export function launch(implementationModel: ImplementationModel) {
   const launcherType = process.env["LAUNCHER_TYPE"];
@@ -23,9 +24,8 @@ export function launch(implementationModel: ImplementationModel) {
       dockerLaunch(launcherImplementation, implementationModel);
     } else if (launcherType === "raw") {
       rawLaunch(launcherImplementation, implementationModel);
-    } else if (launcherType === "node") {
-      //TODO
-      fail(`launcher type not supported yet - ${launcherType}`);
+    } else if (launcherType === "npm") {
+      npmLaunch(launcherImplementation, implementationModel);
     } else {
       fail(`launcher type not supported yet - ${launcherType}`);
     }

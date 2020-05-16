@@ -29,3 +29,17 @@ export interface CommandConfig {
   args: string[];
   env: NodeJS.ProcessEnv;
 }
+
+
+export function runCommand(config: CommandConfig) {
+  const commandProcess = spawn(config.command, config.args, {
+    cwd: config.absolutePath,
+    stdio: "inherit",
+    env: config.env,
+  });
+  exitHook(() => {
+    log.info("killing command process...");
+    commandProcess?.kill();
+    log.info(" command process killed");
+  });
+}
