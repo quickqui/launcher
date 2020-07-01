@@ -17,7 +17,11 @@ export function rawLaunch(
           (imp) => imp.name === launchName
         );
         if (implementation && implementation.runtime === "command") {
-          return command(implementation, launcherEnv);
+          return command(
+            implementation,
+            launcherEnv,
+            launcherImplementation.parameters?.["quickqui_base"]
+          );
         } else {
           return undefined;
         }
@@ -27,15 +31,13 @@ export function rawLaunch(
   commandConfigs.forEach(runCommand);
 }
 
-
-
 function modelServerConfig(
   launcherImplementation: Implementation
 ): CommandConfig {
   return {
     absolutePath: path.resolve(
-      ".",
-      `${launcherImplementation.parameters?.["model_server_path"] ?? ''}`
+      `${launcherImplementation.parameters?.["quickqui_base"] ?? ".."}`,
+      `${launcherImplementation.parameters?.["model_server_path"] ?? ""}`
     ),
     command: "npm",
     args: ["start"],

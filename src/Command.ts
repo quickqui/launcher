@@ -4,16 +4,18 @@ import path from "path";
 import _ from "lodash";
 import exitHook from "async-exit-hook";
 import { log } from "./Util";
+import { config } from "process";
 
 export const command = (
   implementation: Implementation,
-  globalEnv: StringKeyObject
+  globalEnv: StringKeyObject,
+  commonBase?: string
 ): CommandConfig => {
   const p: string = implementation.parameters?.["path"] ?? ".";
   const command = implementation.parameters?.["command"] ?? "npm";
   const args: string[] = implementation.parameters?.["args"] ?? [];
   const env = implementation.env ?? {};
-  const absolutePath = path.resolve(".", p);
+  const absolutePath = path.resolve(commonBase ?? ".", p);
 
   return {
     absolutePath,
@@ -30,8 +32,8 @@ export interface CommandConfig {
   env: NodeJS.ProcessEnv;
 }
 
-
 export function runCommand(config: CommandConfig) {
+  console.log(config.absolutePath);
   const commandProcess = spawn(config.command, config.args, {
     cwd: config.absolutePath,
     stdio: "inherit",
