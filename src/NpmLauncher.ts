@@ -65,7 +65,13 @@ export const npmCommand = (
   const command = implementation.parameters?.["command"] ?? "npm";
   const args: string[] = implementation.parameters?.["args"] ?? [];
   const overrideEnv = { MODEL_PATH: path.resolve(".", "./modelDir") };
-  const env = implementation.env ?? {};
+  const env = _.extend(
+    {},
+    { IMPLEMENTATION_NAME: implementation.name },
+    //TODO 目前是不加区别的加上这一个，显然，非create-react-app不需要。
+    { REACT_APP_IMPLEMENTATION_NAME: implementation.name },
+    implementation.env ?? {}
+  );
   const absolutePath = path.resolve(".", `node_modules/${packageName}`);
   const finalEnv = _.extend(
     {},
@@ -76,7 +82,7 @@ export const npmCommand = (
     overrideEnv
   ) as NodeJS.ProcessEnv;
 
-  log.debug(JSON.stringify(finalEnv,undefined,2));
+  log.debug(JSON.stringify(finalEnv, undefined, 2));
   return {
     absolutePath,
     args,

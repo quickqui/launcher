@@ -14,7 +14,13 @@ export const command = (
   const p: string = implementation.parameters?.["path"] ?? ".";
   const command = implementation.parameters?.["command"] ?? "npm";
   const args: string[] = implementation.parameters?.["args"] ?? [];
-  const env = implementation.env ?? {};
+  const env = _.extend(
+    {},
+    { IMPLEMENTATION_NAME: implementation.name },
+    //TODO 目前是不加区别的加上这一个，显然，非create-react-app不需要。
+    { REACT_APP_IMPLEMENTATION_NAME: implementation.name },
+    implementation.env ?? {}
+  );
   const absolutePath = path.resolve(commonBase ?? ".", p);
 
   return {
