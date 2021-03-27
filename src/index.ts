@@ -6,6 +6,7 @@ import { ImplementationModel } from "@quick-qui/model-defines";
 import { dockerLaunch } from "./DockerLauncher";
 import { rawLaunch } from "./RawLauncher";
 import { npmLaunch } from "./NpmLauncher";
+import { devNpmLaunch } from "./DevNpmLauncher";
 
 export function launch(implementationModel: ImplementationModel) {
   const launcherType = process.env["LAUNCHER_TYPE"];
@@ -26,6 +27,10 @@ export function launch(implementationModel: ImplementationModel) {
       rawLaunch(launcherImplementation, implementationModel);
     } else if (launcherType === "npm") {
       npmLaunch(launcherImplementation, implementationModel);
+    }else if (launcherType === 'devNpm'){
+
+          devNpmLaunch(launcherImplementation, implementationModel);
+
     } else {
       fail(`launcher type not supported yet - ${launcherType}`);
     }
