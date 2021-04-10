@@ -21,6 +21,7 @@ export const command = (
     { REACT_APP_IMPLEMENTATION_NAME: implementation.name },
     implementation.env ?? {}
   );
+
   const absolutePath = path.resolve(commonBase ?? ".", p);
 
   return {
@@ -39,7 +40,6 @@ export interface CommandConfig {
 }
 
 export function runCommand(config: CommandConfig) {
-  console.log(config.absolutePath);
   const commandProcess = spawn(config.command, config.args, {
     cwd: config.absolutePath,
     stdio: "inherit",

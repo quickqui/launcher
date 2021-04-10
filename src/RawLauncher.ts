@@ -1,17 +1,36 @@
-import { ImplementationModel, Implementation } from "@quick-qui/model-defines";
+import {
+  ImplementationModel,
+  Implementation,
+  withImplementationModel,
+} from "@quick-qui/model-defines";
 import { command, CommandConfig, runCommand } from "./Command";
 import _ from "lodash";
 import path from "path";
-export function rawLaunch(
+import { notNil } from "@quick-qui/util";
+import { waitModel } from "./waitModel";
+import { evaluate } from "./evaluate";
+export async function rawLaunch(
   launcherImplementation: Implementation,
-  implementationModel: ImplementationModel
+  evaluateContext: object
 ) {
-  const launcherEnv = launcherImplementation.env ?? {};
   const launch = launcherImplementation.parameters?.["launch"];
+  const launcherEnv = launcherImplementation.env ?? {};
+  const port = evaluateContext["modelServerPort"] ?? launcherEnv["PORT"];
+  const launcherImplementationConfig = modelServerConfig(
+    launcherImplementation,
+    port
+  );
+  runCommand(launcherImplementationConfig);
+  const model = await waitModel(port);
 
-  const commandConfigs = [
-    modelServerConfig(launcherImplementation),
-    ...launch
+  const implementationModel: ImplementationModel = (
+    await evaluate(
+      withImplementationModel(model)?.implementationModel,
+      evaluateContext
+    )
+  )[0] as ImplementationModel;
+  if (implementationModel) {
+    const commandConfigs = launch
       ?.map((launchName) => {
         const implementation = implementationModel?.implementations?.find(
           (imp) => imp.name === launchName
@@ -26,13 +45,15 @@ export function rawLaunch(
           return undefined;
         }
       })
-      .filter((_) => _ !== undefined),
-  ];
-  commandConfigs.forEach(runCommand);
+      .filter(notNil);
+
+    commandConfigs.forEach(runCommand);
+  }
 }
 
 function modelServerConfig(
-  launcherImplementation: Implementation
+  launcherImplementation: Implementation,
+  port: number
 ): CommandConfig {
   return {
     absolutePath: path.resolve(
@@ -43,7 +64,7 @@ function modelServerConfig(
     args: ["start"],
     env: _.extend(
       {
-        PORT: "1111",
+        PORT: port,
         MODEL_PATH: `${launcherImplementation.env?.["MODEL_PATH"]}`,
       },
       process.env,

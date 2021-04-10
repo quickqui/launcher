@@ -1,18 +1,19 @@
 import { ImplementationModel, Implementation } from "@quick-qui/model-defines";
-import { command } from "./Command";
 import { docker, ComposeConfig } from "./Docker";
 import _ from "lodash";
 import * as yaml from "js-yaml";
-import { spawn, execSync } from "child_process";
+import { execSync } from "child_process";
 import path from "path";
 import { filterObject, log, childProcess } from "./Util";
 import exitHook from "async-exit-hook";
-
+//TODO 很久没有保持更新，不在主线上？
 export function dockerLaunch(
   launcherImplementation: Implementation,
   implementationModel: ImplementationModel
 ) {
   const launcherEnv = launcherImplementation.env ?? {};
+
+
   const launch = launcherImplementation.parameters?.["launch"];
 
   const dockerConfigs = [

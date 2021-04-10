@@ -2,69 +2,59 @@ import {
   ImplementationModel,
   Implementation,
   StringKeyObject,
+  withImplementationModel,
 } from "@quick-qui/model-defines";
 import { CommandConfig, runCommand } from "./Command";
 import _ from "lodash";
 import path from "path";
-import pkgDir from "pkg-dir";
 import { log } from "./Util";
-export function npmLaunch(
+import { evaluate } from "./evaluate";
+import { notNil } from "@quick-qui/util";
+import { waitModel } from "./waitModel";
+export async function npmLaunch(
   launcherImplementation: Implementation,
-  implementationModel: ImplementationModel
+  evaluateContext: object
 ) {
-  const launcherEnv = launcherImplementation.env ?? {};
+  const modelFolder = "./modelDir";
   const launch = launcherImplementation.parameters?.["launch"];
+  const launcherEnv = launcherImplementation.env ?? {};
+  const port = evaluateContext["modelServerPort"] ?? launcherEnv['PORT'];
+  const launcherImplementationConfig = modelServerConfig(port, modelFolder);
+  runCommand(launcherImplementationConfig);
 
-  const commandConfigs = [
-    modelServerConfig(launcherImplementation),
-    ...launch
+  const model = await waitModel(port);
+  const implementationModel: ImplementationModel = (
+    await evaluate(
+      withImplementationModel(model)?.implementationModel,
+      evaluateContext
+    )
+  )[0] as ImplementationModel;
+  if (implementationModel) {
+    const commandConfigs = launch
       ?.map((launchName) => {
         const implementation = implementationModel?.implementations?.find(
           (imp) => imp.name === launchName
         );
         if (implementation && implementation.runtime === "command") {
-          return npmCommand(implementation, launcherEnv);
+          return npmCommand(implementation, launcherEnv, modelFolder);
         } else {
           return undefined;
         }
       })
-      .filter((_) => _ !== undefined),
-  ];
-  // console.log(commandConfigs)
-  commandConfigs.forEach(runCommand);
+      .filter(notNil);
+    // console.log(commandConfigs)
+    commandConfigs.forEach(runCommand);
+  }
 }
-
-function modelServerConfig(
-  launcherImplementation: Implementation
-): CommandConfig {
-  const modelServerPackageName = "@quick-qui/model-server";
-  const serverPath = path.resolve(
-    ".",
-    `node_modules/${modelServerPackageName}`
-  );
-  return {
-    absolutePath: path.resolve(".", serverPath!),
-    command: "npm",
-    args: ["start"],
-    env: _.extend(
-      {
-        PORT: "1111",
-        MODEL_PATH: path.resolve(".", "./modelDir"),
-      },
-      process.env,
-      { PATH: process.env.PATH }
-    ),
-  };
-}
-
 export const npmCommand = (
   implementation: Implementation,
-  globalEnv: StringKeyObject
+  globalEnv: StringKeyObject,
+  modelFolder: string
 ): CommandConfig => {
   const packageName: string = implementation.parameters?.["packageName"]!;
   const command = implementation.parameters?.["command"] ?? "npm";
   const args: string[] = implementation.parameters?.["args"] ?? [];
-  const overrideEnv = { MODEL_PATH: path.resolve(".", "./modelDir") };
+  const overrideEnv = { MODEL_PATH: path.resolve(".", modelFolder) };
   const env = _.extend(
     {},
     { IMPLEMENTATION_NAME: implementation.name },
@@ -90,3 +80,27 @@ export const npmCommand = (
     env: finalEnv,
   };
 };
+
+export function modelServerConfig(
+  port: number,
+  modelFolder: string
+): CommandConfig {
+  const modelServerPackageName = "@quick-qui/model-server";
+  const serverPath = path.resolve(
+    ".",
+    `node_modules/${modelServerPackageName}`
+  );
+  return {
+    absolutePath: path.resolve(".", serverPath!),
+    command: "npm",
+    args: ["start"],
+    env: _.extend(
+      {
+        PORT: port,
+        MODEL_PATH: path.resolve(".", modelFolder),
+      },
+      process.env,
+      { PATH: process.env.PATH }
+    ),
+  };
+}

@@ -1,36 +1,28 @@
 export { dockerLaunch, modelServerConfig } from "./DockerLauncher";
 export { rawLaunch } from "./RawLauncher";
 export { filterObject, noEnvFound } from "./Util";
-import assert, { fail } from "assert";
-import { ImplementationModel } from "@quick-qui/model-defines";
-import { dockerLaunch } from "./DockerLauncher";
+import { fail } from "assert";
+import { Implementation } from "@quick-qui/model-defines";
 import { rawLaunch } from "./RawLauncher";
 import { npmLaunch } from "./NpmLauncher";
 import { devNpmLaunch } from "./DevNpmLauncher";
+import { evaluate } from "./evaluate";
 
-export function launch(implementationModel: ImplementationModel) {
+export async function launch(launcherImplementation: Implementation) {
   const launcherType = process.env["LAUNCHER_TYPE"];
   const launcherName = process.env["LAUNCHER_NAME"];
 
-  const launcherImplementation = implementationModel?.implementations.find(
-    (implementation) =>
-      (implementation.abstract ?? false) !== true &&
-      implementation.runtime === "launcher" &&
-      ((launcherName ? implementation.name === launcherName : false) ||
-        launcherType === implementation.parameters?.type)
-  );
-
-  if (launcherImplementation) {
-    if (launcherType === "docker") {
-      dockerLaunch(launcherImplementation, implementationModel);
-    } else if (launcherType === "raw") {
-      rawLaunch(launcherImplementation, implementationModel);
+  const [lI, context] = await evaluate(launcherImplementation, {});
+  if (lI) {
+    // if (launcherType === "docker") {
+    //   dockerLaunch(launcherImplementation);
+    // } else
+    if (launcherType === "raw") {
+      rawLaunch(lI as Implementation, context);
     } else if (launcherType === "npm") {
-      npmLaunch(launcherImplementation, implementationModel);
-    }else if (launcherType === 'devNpm'){
-
-          devNpmLaunch(launcherImplementation, implementationModel);
-
+      npmLaunch(lI as Implementation, context);
+    } else if (launcherType === "devNpm") {
+      devNpmLaunch(lI as Implementation, context);
     } else {
       fail(`launcher type not supported yet - ${launcherType}`);
     }
