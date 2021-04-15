@@ -7,6 +7,7 @@ import { rawLaunch } from "./RawLauncher";
 import { npmLaunch } from "./NpmLauncher";
 import { devNpmLaunch } from "./DevNpmLauncher";
 import { evaluate } from "./evaluate";
+import { flatNpmLaunch } from "./FlatNpmLauncher";
 
 export async function launch(launcherImplementation: Implementation) {
   const launcherType = process.env["LAUNCHER_TYPE"];
@@ -23,6 +24,8 @@ export async function launch(launcherImplementation: Implementation) {
       npmLaunch(lI as Implementation, context);
     } else if (launcherType === "devNpm") {
       devNpmLaunch(lI as Implementation, context);
+    } else if (launcherType === "flatNpm") {
+      flatNpmLaunch(lI as Implementation, context);
     } else {
       fail(`launcher type not supported yet - ${launcherType}`);
     }

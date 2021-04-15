@@ -1,6 +1,7 @@
 import { fail } from "assert";
 import { spawn, spawnSync } from "child_process";
 import path from "path";
+import {logging} from '@quick-qui/util'
 
 export function filterObject(obj: any) {
   const ret: any = {};
@@ -14,7 +15,7 @@ export function noEnvFound(name: string, help?: string) {
   fail(`env not found - ${name} - ${help ?? ""}`);
 }
 
-export const log = require("debug-logger")("quick-qui:launcher");
+export const log = logging("quick-qui:launcher");
 
 export function childProcess(
   command: string,
