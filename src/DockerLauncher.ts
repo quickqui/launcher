@@ -40,9 +40,9 @@ export function dockerLaunch(
     dockerConfigs.forEach((config) => {
       all.services[config.service] = filterObject(_.omit(config, "service"));
     });
-    log.debug(yaml.safeDump(all));
+    log.debug(yaml.dump(all));
 
-    const configString = yaml.safeDump(all);
+    const configString = yaml.dump(all);
 
     const project = `docker-launcher-${launcherImplementation.name}`;
     const command = "docker-compose";
