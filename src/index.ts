@@ -18,14 +18,15 @@ export async function launch(launcherImplementation: Implementation) {
     // if (launcherType === "docker") {
     //   dockerLaunch(launcherImplementation);
     // } else
+    const li = lI as Implementation;
     if (launcherType === "raw") {
-      rawLaunch(lI as Implementation, context);
+      rawLaunch(li, context);
     } else if (launcherType === "npm") {
-      npmLaunch(lI as Implementation, context);
+      npmLaunch(li, context);
     } else if (launcherType === "devNpm") {
-      devNpmLaunch(lI as Implementation, context);
+      devNpmLaunch(li, context);
     } else if (launcherType === "flatNpm") {
-      flatNpmLaunch(lI as Implementation, context);
+      flatNpmLaunch(li, context);
     } else {
       fail(`launcher type not supported yet - ${launcherType}`);
     }

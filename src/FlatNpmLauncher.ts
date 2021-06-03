@@ -9,7 +9,8 @@ import _ from "lodash";
 import path from "path";
 import { sync } from "./DevSupport";
 import { evaluate } from "./evaluate";
-import { modelServerConfig, npmCommand } from "./NpmLauncher";
+import { modelServerConfig } from "./modelServerConfig";
+import { npmCommand } from "./npmCommand";
 import { waitModel } from "./waitModel";
 
 export async function flatNpmLaunch(
