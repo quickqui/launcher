@@ -21,10 +21,10 @@ export async function launch(launcherImplementation: Implementation) {
     const li = lI as Implementation;
     if (launcherType === "raw") {
       rawLaunch(li, context);
-    } else if (launcherType === "npm") {
-      npmLaunch(li, context);
-    } else if (launcherType === "devNpm") {
-      devNpmLaunch(li, context);
+    // } else if (launcherType === "npm") {
+    //   npmLaunch(li, context);
+    // } else if (launcherType === "devNpm") {
+    //   devNpmLaunch(li, context);
     } else if (launcherType === "flatNpm") {
       flatNpmLaunch(li, context);
     } else {

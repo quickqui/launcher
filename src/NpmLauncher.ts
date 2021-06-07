@@ -17,6 +17,7 @@ export async function npmLaunch(
   const launch = launcherImplementation.parameters?.["launch"];
   const launcherEnv = launcherImplementation.env ?? {};
   const port = evaluateContext["modelServerPort"] ?? launcherEnv["PORT"];
+  
   const launcherImplementationConfig = modelServerConfig(port, modelFolder);
   runCommand(launcherImplementationConfig);
 
