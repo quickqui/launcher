@@ -2,10 +2,8 @@ export { dockerLaunch, modelServerConfig } from "./DockerLauncher";
 export { rawLaunch } from "./RawLauncher";
 export { filterObject, noEnvFound } from "./Util";
 import { fail } from "assert";
-import { Implementation } from "@quick-qui/model-defines";
+import { Implementation } from "@quick-qui/implementation-model";
 import { rawLaunch } from "./RawLauncher";
-import { npmLaunch } from "./NpmLauncher";
-import { devNpmLaunch } from "./DevNpmLauncher";
 import { evaluate } from "./evaluate";
 import { flatNpmLaunch } from "./FlatNpmLauncher";
 
@@ -21,11 +19,13 @@ export async function launch(launcherImplementation: Implementation) {
     const li = lI as Implementation;
     if (launcherType === "raw") {
       rawLaunch(li, context);
-    // } else if (launcherType === "npm") {
-    //   npmLaunch(li, context);
-    // } else if (launcherType === "devNpm") {
-    //   devNpmLaunch(li, context);
+      // } else if (launcherType === "npm") {
+      //   npmLaunch(li, context);
+      // } else if (launcherType === "devNpm") {
+      //   devNpmLaunch(li, context);
     } else if (launcherType === "flatNpm") {
+      flatNpmLaunch(li, context);
+    } else if (launcherType === "electron") {
       flatNpmLaunch(li, context);
     } else {
       fail(`launcher type not supported yet - ${launcherType}`);

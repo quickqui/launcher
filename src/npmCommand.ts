@@ -1,15 +1,16 @@
-import {
-  Implementation,
-  StringKeyObject
-} from "@quick-qui/model-defines";
+import { StringKeyObject } from "@quick-qui/model-defines";
+import { Implementation } from "@quick-qui/implementation-model";
+
 import { CommandConfig } from "./Command";
 import _ from "lodash";
 import path from "path";
 import { log } from "./Util";
 
-export function npmCommand(implementation: Implementation,
+export function npmCommand(
+  implementation: Implementation,
   globalEnv: StringKeyObject,
-  modelFolder: string): CommandConfig {
+  modelFolder: string
+): CommandConfig {
   const packageName: string = implementation.parameters?.["packageName"]!;
   const command = implementation.parameters?.["command"] ?? "npm";
   const args: string[] = implementation.parameters?.["args"] ?? [];

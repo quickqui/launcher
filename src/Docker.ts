@@ -1,4 +1,6 @@
-import { Implementation, StringKeyObject } from "@quick-qui/model-defines";
+import {  StringKeyObject } from "@quick-qui/model-defines";
+import { Implementation } from "@quick-qui/implementation-model";
+
 import _ from "lodash";
 
 export function docker(

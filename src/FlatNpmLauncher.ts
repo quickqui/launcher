@@ -3,7 +3,7 @@ import {
   Implementation,
   withImplementationModel,
   ImplementationModel,
-} from "@quick-qui/model-defines";
+} from "@quick-qui/implementation-model";
 import { runCommand } from "./Command";
 import _ from "lodash";
 import path from "path";

@@ -1,10 +1,11 @@
-import { Implementation, StringKeyObject } from "@quick-qui/model-defines";
+import { Implementation,  } from "@quick-qui/implementation-model";
 import { spawn } from "child_process";
 import path from "path";
 import _ from "lodash";
 import exitHook from "async-exit-hook";
 import { log } from "./Util";
 import { config } from "process";
+import { StringKeyObject } from "@quick-qui/model-defines";
 
 export const command = (
   implementation: Implementation,

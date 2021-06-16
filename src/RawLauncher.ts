@@ -2,7 +2,7 @@ import {
   ImplementationModel,
   Implementation,
   withImplementationModel,
-} from "@quick-qui/model-defines";
+} from "@quick-qui/implementation-model";
 import { command, CommandConfig, runCommand } from "./Command";
 import _ from "lodash";
 import path from "path";

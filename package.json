@@ -13,9 +13,10 @@
     "start": "nodemon -x ts-node  src/index.ts"
   },
   "dependencies": {
-    "@quick-qui/model-defines": "^2.7.1",
+    "@quick-qui/implementation-model": "^1.10.3",
+    "@quick-qui/model-defines": "^2.8.0",
     "@types/js-yaml": "^4.0.1",
-    "@types/lodash": "^4.14.165",
+    "@types/lodash": "^4.14.170",
     "@types/pkg-dir": "^2.0.1",
     "async-exit-hook": "^2.0.1",
     "axios": "^0.21.1",
@@ -25,14 +26,14 @@
     "merge-options": "^3.0.4",
     "pkg-dir": "^5.0.0",
     "portfinder": "^1.0.28",
-    "sync-directory": "^2.2.17",
+    "sync-directory": "^2.2.22",
     "wait-port": "^0.2.9"
   },
   "devDependencies": {
-    "@types/node": "^14.14.41",
+    "@types/node": "^15.12.2",
     "nodemon": "^2.0.6",
-    "ts-node": "^9.1.1",
-    "typescript": "^4.2.4"
+    "ts-node": "^10.0.0",
+    "typescript": "^4.3.2"
   },
   "license": "MIT"
 }

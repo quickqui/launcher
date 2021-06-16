@@ -1,4 +1,4 @@
-import { ImplementationModel, Implementation } from "@quick-qui/model-defines";
+import { ImplementationModel, Implementation } from "@quick-qui/implementation-model";
 import { docker, ComposeConfig } from "./Docker";
 import _ from "lodash";
 import * as yaml from "js-yaml";
