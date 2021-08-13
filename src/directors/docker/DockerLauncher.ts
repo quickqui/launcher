@@ -1,11 +1,11 @@
-import { ImplementationModel, Implementation } from "@quick-qui/implementation-model";
-import { docker, ComposeConfig } from "./Docker";
-import _ from "lodash";
-import * as yaml from "js-yaml";
-import { execSync } from "child_process";
-import path from "path";
-import { filterObject, log, childProcess } from "./Util";
+import { Implementation, ImplementationModel } from "@quick-qui/implementation-model";
 import exitHook from "async-exit-hook";
+import { execSync } from "child_process";
+import * as yaml from "js-yaml";
+import _ from "lodash";
+import path from "path";
+import { childProcess, filterObject, log } from "../../Util";
+import { ComposeConfig, docker } from "./Docker";
 //TODO 很久没有保持更新，不在主线上？
 export function dockerLaunch(
   launcherImplementation: Implementation,

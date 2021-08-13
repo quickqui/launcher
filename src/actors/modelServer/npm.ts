@@ -1,4 +1,4 @@
-import { CommandConfig } from "./Command";
+import { CommandConfig } from "../../Command";
 import _ from "lodash";
 import path from "path";
 

@@ -1,10 +1,10 @@
 import { StringKeyObject } from "@quick-qui/model-defines";
 import { Implementation } from "@quick-qui/implementation-model";
 
-import { CommandConfig } from "./Command";
+import { CommandConfig } from "../../Command";
 import _ from "lodash";
 import path from "path";
-import { log } from "./Util";
+import { log } from "../../Util";
 
 export function npmCommand(
   implementation: Implementation,
@@ -43,5 +43,6 @@ export function npmCommand(
     args,
     command,
     env: finalEnv,
+    name: implementation.name,
   };
 }

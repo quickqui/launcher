@@ -1,43 +1,16 @@
-import { Implementation,  } from "@quick-qui/implementation-model";
-import { spawn } from "child_process";
-import path from "path";
-import _ from "lodash";
 import exitHook from "async-exit-hook";
+import { spawn } from "child_process";
+import pm2 from "pm2";
 import { log } from "./Util";
-import { config } from "process";
-import { StringKeyObject } from "@quick-qui/model-defines";
 
-export const command = (
-  implementation: Implementation,
-  globalEnv: StringKeyObject,
-  commonBase?: string
-): CommandConfig => {
-  const p: string = implementation.parameters?.["path"] ?? ".";
-  const command = implementation.parameters?.["command"] ?? "npm";
-  const args: string[] = implementation.parameters?.["args"] ?? [];
-  const env = _.extend(
-    {},
-    { IMPLEMENTATION_NAME: implementation.name },
-    //TODO 目前是不加区别的加上这一个，显然，非create-react-app不需要。
-    { REACT_APP_IMPLEMENTATION_NAME: implementation.name },
-    implementation.env ?? {}
-  );
 
-  const absolutePath = path.resolve(commonBase ?? ".", p);
-
-  return {
-    absolutePath,
-    args,
-    command,
-    env: _.extend({}, process.env, { PATH: process.env.PATH }, globalEnv, env),
-  };
-};
 
 export interface CommandConfig {
   absolutePath: string;
   command: string;
   args: string[];
   env: NodeJS.ProcessEnv;
+  name?: string;
 }
 
 export function runCommand(config: CommandConfig) {
@@ -47,8 +20,35 @@ export function runCommand(config: CommandConfig) {
     env: config.env,
   });
   exitHook(() => {
-    log.info("killing command process...");
+    log.info(`killing command process, name - ${config.name}...`);
     commandProcess?.kill();
     log.info(" command process killed");
+  });
+}
+
+export function runCommandInPm2(config: CommandConfig) {
+
+  pm2.connect(function (err) {
+    if (err) {
+      log.error(err);
+    } else {
+      pm2.start(
+        {
+          script: config.command,
+          name: config.name,
+          cwd: config.absolutePath,
+          args: config.args,
+          env: config.env as { [key: string]: string },
+        },
+        function (err, apps) {
+          if (err) {
+            log.error(err);
+          } else {
+            log.info("in start callback");
+            log.info(apps);
+          }
+        }
+      );
+    }
   });
 }

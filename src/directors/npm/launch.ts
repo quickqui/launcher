@@ -4,16 +4,15 @@ import {
   withImplementationModel,
   ImplementationModel,
 } from "@quick-qui/implementation-model";
-import { runCommand } from "./Command";
+import { runCommandInPm2, runCommand, CommandConfig } from "../../Command";
 import _ from "lodash";
-import path from "path";
-import { sync } from "./DevSupport";
-import { evaluate } from "./evaluate";
-import { modelServerConfig } from "./modelServerConfig";
+import { run } from "../../actors/sync/npm";
+import { evaluate } from "../../evaluate";
+import { modelServerConfig } from "../../actors/modelServer/npm";
 import { npmCommand } from "./npmCommand";
-import { waitModel } from "./waitModel";
+import { waitModel } from "../../waitModel";
 
-export async function flatNpmLaunch(
+export async function npmLaunch(
   launcherImplementation: Implementation,
   evaluateContext: object
 ) {
@@ -22,7 +21,12 @@ export async function flatNpmLaunch(
   const launcherEnv = launcherImplementation.env ?? {};
   const port = evaluateContext["modelServerPort"] ?? launcherEnv["PORT"];
   const launcherImplementationConfig = modelServerConfig(port, modelFolder);
-  runCommand(launcherImplementationConfig);
+  let runner: (arg0: CommandConfig) => void;
+
+  if (launcherImplementation.parameters?.["pm"] === "pm2")
+    runner = runCommandInPm2;
+  else runner = runCommand;
+  runner(launcherImplementationConfig);
   const model = await waitModel(port);
   const implementationModel: ImplementationModel = (
     await evaluate(
@@ -43,15 +47,9 @@ export async function flatNpmLaunch(
         }
       })
       .filter(notNil);
-    commandConfigs.forEach(runCommand);
+    commandConfigs.forEach(runner);
     // start up sync
-    sync(
-      path.resolve(process.env.DEV_MODEL_PATH!, "model"),
-      path.resolve(".", modelFolder, "model")
-    );
-    sync(
-      path.resolve(process.env.DEV_MODEL_PATH!, "dist"),
-      path.resolve(".", modelFolder, "dist")
-    );
+    // if have actor sync
+    run(modelFolder);
   }
 }

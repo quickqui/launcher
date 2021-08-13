@@ -3,12 +3,13 @@ import {
   Implementation,
   withImplementationModel,
 } from "@quick-qui/implementation-model";
-import { command, CommandConfig, runCommand } from "./Command";
+import { runCommand } from "../../Command";
+import { rawCommand } from "./RawCommand";
 import _ from "lodash";
-import path from "path";
 import { notNil } from "@quick-qui/util";
-import { waitModel } from "./waitModel";
-import { evaluate } from "./evaluate";
+import { waitModel } from "../../waitModel";
+import { modelServerConfig } from "../../actors/modelServer/raw";
+import { evaluate } from "../../evaluate";
 export async function rawLaunch(
   launcherImplementation: Implementation,
   evaluateContext: object
@@ -36,7 +37,7 @@ export async function rawLaunch(
           (imp) => imp.name === launchName
         );
         if (implementation && implementation.runtime === "command") {
-          return command(
+          return rawCommand(
             implementation,
             launcherEnv,
             launcherImplementation.parameters?.["quickqui_base"]
@@ -49,26 +50,4 @@ export async function rawLaunch(
 
     commandConfigs.forEach(runCommand);
   }
-}
-
-function modelServerConfig(
-  launcherImplementation: Implementation,
-  port: number
-): CommandConfig {
-  return {
-    absolutePath: path.resolve(
-      `${launcherImplementation.parameters?.["quickqui_base"] ?? ".."}`,
-      `${launcherImplementation.parameters?.["model_server_path"] ?? ""}`
-    ),
-    command: "npm",
-    args: ["start"],
-    env: _.extend(
-      {
-        PORT: port,
-        MODEL_PATH: `${launcherImplementation.env?.["MODEL_PATH"]}`,
-      },
-      process.env,
-      { PATH: process.env.PATH }
-    ),
-  };
 }
