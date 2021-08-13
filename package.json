@@ -1,6 +1,6 @@
 {
   "name": "@quick-qui/launcher",
-  "version": "1.6.3",
+  "version": "1.7.0",
   "main": "dist/index.js",
   "repository": "https://github.com/quickqui/launcher",
   "config": {
